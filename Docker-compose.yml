@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   snmppowermon:
-    image: FROM ghcr.io/tiernano/snmppowermon:main
+    image: ghcr.io/tiernano/snmppowermon:main
     env_file: snmppowermon.env
     volumes:
     - ./snmppowermon/data:/app/data
