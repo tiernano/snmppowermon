@@ -9,6 +9,9 @@
 
   <ItemGroup>
     <PackageReference Include="Lextm.SharpSnmpLib" Version="12.5.0-beta5" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
   </ItemGroup>
 
 </Project>
