@@ -1,28 +1,31 @@
 ﻿using Lextm.SharpSnmpLib;
 using Lextm.SharpSnmpLib.Messaging;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 class Program {
     static async Task Main(string[] args)
     {
+        using var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder
+                .AddFilter("Microsoft", LogLevel.Warning)
+                .AddFilter("System", LogLevel.Warning)
+                .AddFilter("NonHostConsoleApp.Program", LogLevel.Debug)
+                .AddConsole();
+        });
+        ILogger logger = loggerFactory.CreateLogger<Program>();
+        
         string identifier = "1.3.6.1.4.1.318.1.1.12.1.16.0";
         var identifierEnv = Environment.GetEnvironmentVariable("SNMPIdentifier");
         if(!string.IsNullOrEmpty(identifierEnv)){
-            Console.WriteLine($"Env Found for Identifier: {identifierEnv}");
+            logger.LogDebug($"Env Found for Identifier: {identifierEnv}");
             identifier = identifierEnv;
         }
 
         string IPAddress = "10.244.10.10";
         var IPAddressEnv = Environment.GetEnvironmentVariable("SNMPIPAddress");
         if(!string.IsNullOrEmpty(IPAddressEnv)){
-            Console.WriteLine($"Env Found for IPAddressEnv: {IPAddressEnv}");
+            logger.LogDebug($"Env Found for IPAddressEnv: {IPAddressEnv}");
             IPAddress = IPAddressEnv;
         }
 
@@ -30,7 +33,7 @@ class Program {
 
         var communityEnv = Environment.GetEnvironmentVariable("SNMPcommunity");
         if(!string.IsNullOrEmpty(communityEnv)){
-            Console.WriteLine($"Env Found for communityEnv: {communityEnv}");
+            logger.LogDebug($"Env Found for communityEnv: {communityEnv}");
             community = communityEnv;
         }
 
@@ -44,11 +47,24 @@ class Program {
             var data = await File.ReadAllTextAsync(runningTotalFileName);
 
             if(Decimal.TryParse(data, out totalWHs)){
-                Console.WriteLine($"last result: {totalWHs}");
+                logger.LogInformation($"last result: {totalWHs}");
             }
         }
 
-        while(true){
+        AppDomain.CurrentDomain.ProcessExit +=  (_, _) => {
+            logger.LogInformation("Process Exist...");
+            WriteToFile(dataFileName, runningTotalFileName, totalWHs, 0, 0).GetAwaiter().GetResult();
+            logger.LogInformation("Data Written");
+        };
+
+        Console.CancelKeyPress +=  (_,_) => {
+            logger.LogInformation("Cancel Key Press");
+            WriteToFile(dataFileName, runningTotalFileName, totalWHs, 0, 0).GetAwaiter().GetResult();
+            logger.LogInformation("Data Written");
+        };
+
+        while(true)
+        {
 
             var data = await Messenger.GetAsync(VersionCode.V1, 
                 new System.Net.IPEndPoint(System.Net.IPAddress.Parse(IPAddress), 161),
@@ -65,13 +81,16 @@ class Program {
             }
             totalWHs += wattHs;
 
-            await File.WriteAllTextAsync(runningTotalFileName, totalWHs.ToString());
-            File.AppendAllText(dataFileName, $"{DateTime.Now.Ticks} - {watts} - {wattHs}{Environment.NewLine}");
-
-            Console.WriteLine($"{DateTime.Now} - Current Watts: {watts}, current wHs: {wattHs}. Running Total: {totalWHs}");
+            await WriteToFile(dataFileName, runningTotalFileName, totalWHs, watts, wattHs);
+           
+            logger.LogInformation($"{DateTime.Now} - Current Watts: {watts}, current wHs: {wattHs}. Running Total: {totalWHs}");
             Thread.Sleep(TimeSpan.FromSeconds(15));
         }
+    }
 
-
+    static async Task WriteToFile(string dataFileName, string runningTotalFileName, decimal totalWHs, decimal watts, decimal wattHs)
+    {
+            await File.WriteAllTextAsync(runningTotalFileName, totalWHs.ToString());
+            File.AppendAllText(dataFileName, $"{DateTime.Now.Ticks} - {watts} - {wattHs}{Environment.NewLine}");
     }
 }
