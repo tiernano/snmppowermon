@@ -39,3 +39,6 @@ msbuild.wrn
 # data files
 data.txt
 total.txt
+
+#envFiles
+snmppowermon.env

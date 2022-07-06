@@ -13,10 +13,30 @@ class Program {
     static async Task Main(string[] args)
     {
         string identifier = "1.3.6.1.4.1.318.1.1.12.1.16.0";
+        var identifierEnv = Environment.GetEnvironmentVariable("SNMPIdentifier");
+        if(!string.IsNullOrEmpty(identifierEnv)){
+            Console.WriteLine($"Env Found for Identifier: {identifierEnv}");
+            identifier = identifierEnv;
+        }
+
         string IPAddress = "10.244.10.10";
+        var IPAddressEnv = Environment.GetEnvironmentVariable("SNMPIPAddress");
+        if(!string.IsNullOrEmpty(IPAddressEnv)){
+            Console.WriteLine($"Env Found for IPAddressEnv: {IPAddressEnv}");
+            IPAddress = IPAddressEnv;
+        }
+
         string community = "public";
-        string dataFileName = "data.txt";
-        string runningTotalFileName = "total.txt";
+
+        var communityEnv = Environment.GetEnvironmentVariable("SNMPcommunity");
+        if(!string.IsNullOrEmpty(communityEnv)){
+            Console.WriteLine($"Env Found for communityEnv: {communityEnv}");
+            community = communityEnv;
+        }
+
+
+        string dataFileName =  Path.Combine("data", "data.txt");
+        string runningTotalFileName = Path.Combine("data", "total.txt");
 
         decimal totalWHs = 0;
         if(File.Exists(runningTotalFileName))

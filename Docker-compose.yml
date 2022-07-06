@@ -11,5 +11,5 @@ services:
     ports: 
       - "8888:80"
     volumes:
-    - ./snmppowermon/data:/var/www/html
+    - ./snmppowermon/data:/usr/share/nginx/html:ro
 
