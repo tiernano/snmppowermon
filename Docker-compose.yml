@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  snmppowermon:
+    image: tiernano/snmppowermon
+    env_file: snmppowermon.env
+    volumes:
+    - ./snmppowermon/data:/app/data
+  nginx:
+    image: nginx
+    ports: 
+      - "8888:80"
+    volumes:
+    - ./snmppowermon/data:/var/www/html
+
