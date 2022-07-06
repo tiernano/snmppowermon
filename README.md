@@ -19,20 +19,24 @@ Till i get the full docker side of things working, the following steps are requi
 * `docker-compose up -d`
 * in home assistant, edit the configuration.yml file and add the following:
 
-`sensor:
+```
+sensor:
   - platform: rest
     resource: http://<ip>:<port>/total.txt
     unit_of_measurement: "Wh"
     device_class: energy
-    state_class: total_increasing`
+    state_class: total_increasing
+```
 
 * change the IP to the correct IP of your docker instance. 
 
 * you may need a customize.yaml with the following:
 
-`sensor.rest_energy:
+```
+sensor.rest_energy:
   device_class: energy
-  state_class: measurement`
+  state_class: measurement
+```
 
 * restart home assistant
 * in home assistant, go to settings, dashboards, energy and click "Add Consumption". 
