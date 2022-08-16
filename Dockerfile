@@ -1,4 +1,9 @@
 FROM mcr.microsoft.com/dotnet/nightly/sdk:6.0-jammy AS build-env
+
+LABEL org.opencontainers.image.source  "https://github.com/tiernano/snmppowermon"
+LABEL org.opencontainers.image.description "SNMP Power Monitor, used for HomeAssistant"
+LABEL org.opencontainers.image.url "https://github.com/tiernano/snmppowermon"
+
 WORKDIR /app
 
 # Copy everything
