@@ -44,9 +44,6 @@ jobs:
         with:
           cosign-release: 'v2.0.0-rc.0'
 
-
-
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -65,7 +62,7 @@ jobs:
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
-        id: meta
+        id: docker_meta
         uses: docker/metadata-action@v3.6.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
